@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AuthResponse } from '../../types/authResponse.type';
@@ -10,12 +11,26 @@ import { AuthResponse } from '../../types/authResponse.type';
   styleUrls: ['./login-page.component.scss'],
 })
 export class LoginPageComponent implements OnInit {
+  loginForm = new FormGroup({
+    identifier: new FormControl('', [
+      Validators.required,
+      Validators.minLength(3),
+    ]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6)
+    ]),
+  })
+  isPasswordVisible: boolean = false;
   isLoading: boolean = false;
 
-  form = {
-    identifier: '',
-    password: '',
-  };
+  get identifierErrors() {
+    return this.loginForm.controls.identifier.errors
+  }
+
+  get passwordErrors() {
+    return this.loginForm.controls.password.errors
+  }
 
   constructor(
     private authService: AuthService,
@@ -27,19 +42,20 @@ export class LoginPageComponent implements OnInit {
 
   login() {
     this.isLoading = true;
+    console.log(this.loginForm)
 
-    this.authService.login(this.form).subscribe((response: AuthResponse) => {
-      this.authService.setToken(response.jwt);
-      this.userService.setUser(response.user);
+    if (!this.loginForm.valid) return;
 
-      this.isLoading = false;
+    this.authService.login(this.loginForm.value)
+      .subscribe((response: AuthResponse) => {
+        this.authService.setToken(response.jwt);
+        this.userService.setUser(response.user);
 
-      this.form = {
-        identifier: '',
-        password: '',
-      };
+        this.isLoading = false;
 
-      this.router.navigateByUrl('/');
-    });
+        this.loginForm.reset()
+
+        this.router.navigateByUrl('/');
+      });
   }
 }
