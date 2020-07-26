@@ -8,9 +8,12 @@ import { User } from '../types/user.type';
 })
 export class AuthService {
   baseUrl = 'http://localhost:1337/auth';
-  // jwt: string;
 
   constructor(private http: HttpClient, private userService: UserService) {}
+
+  isAuthenticated(): boolean {
+    return !!window.localStorage.getItem('token');
+  }
 
   register(registerData) {
     return this.http.post(`${this.baseUrl}/local/register`, registerData);
@@ -21,13 +24,11 @@ export class AuthService {
   }
 
   logout() {
-    // this.jwt = '';
     window.localStorage.removeItem('token');
     this.userService.setUser();
   }
 
   setToken(token: string) {
-    // this.jwt = token;
     window.localStorage.setItem('token', token);
   }
 }

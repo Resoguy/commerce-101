@@ -1,0 +1,16 @@
+<mat-toolbar>
+  <a mat-button routerLink="/">MyCommerce</a>
+
+  <span class="spacer"></span>
+  
+  <ng-container *ngIf="!user; else userMenu">
+    <a mat-button routerLink="/login">Login</a>
+    <a mat-button routerLink="/register">Register</a>
+  </ng-container>
+
+  <ng-template #userMenu>
+    <span>Hello, {{user.username}}</span>
+    <a mat-button routerLink="/profile">My Profile</a>
+    <button mat-button (click)="logout()">Logout</button>
+  </ng-template>
+</mat-toolbar>
